@@ -1,0 +1,17 @@
+# List of allowed assignees (use email or user GID for identification)
+ALLOWED_ASSIGNEES = ['allowed_user_1@example.com', 'allowed_user_2@example.com']
+
+if action == 'added' and task.get('resource_type') == 'task':
+    task_details = get_task_details(task_id)
+
+    # Check the task's assignee
+    assignee = task_details.get('assignee', {}).get('email')  # Assuming 'email' is part of the details
+    if assignee in ALLOWED_ASSIGNEES:  # Only proceed if the assignee is allowed
+        initial_due_date = task_details.get('due_on')
+        if task_details.get('name') and not initial_due_date:
+            if 'custom_fields' in task_details:
+                for field in task_details['custom_fields']:
+                    if field.get('enum_value') and field['enum_value']['gid'] in PRIORITY_MAPPING:
+                        priority = PRIORITY_MAPPING[field['enum_value']['gid']]
+                        update_due_date(task_id, priority)
+                        break
